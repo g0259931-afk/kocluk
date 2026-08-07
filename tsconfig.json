@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/web/*": ["apps/web/*"],
+      "@/admin/*": ["apps/admin/*"],
+      "@/backend/*": ["apps/backend/*"],
+      "@/ui/*": ["packages/ui/*"],
+      "@/shared/*": ["packages/shared/*"],
+      "@/auth/*": ["packages/auth/*"],
+      "@/database/*": ["packages/database/*"],
+      "@/ai/*": ["packages/ai/*"],
+      "@/api/*": ["packages/api/*"],
+      "@/config/*": ["packages/config/*"],
+      "@/types/*": ["packages/types/*"],
+      "@/hooks/*": ["packages/hooks/*"],
+      "@/utils/*": ["packages/utils/*"],
+      "@/services/*": ["packages/services/*"],
+      "@/repositories/*": ["packages/repositories/*"]
+    }
+  },
+  "exclude": ["node_modules"]
+}
