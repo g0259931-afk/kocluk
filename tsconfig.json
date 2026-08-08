@@ -22,6 +22,7 @@
       "@saas-coach/auth": ["packages/auth/index.ts"],
       "@saas-coach/database": ["packages/database/index.ts"],
       "@saas-coach/ai": ["packages/ai/index.ts"],
+      "@saas-coach/backend": ["apps/backend/index.ts"],
       "@/web/*": ["apps/web/*"],
       "@/admin/*": ["apps/admin/*"],
       "@/backend/*": ["apps/backend/*"],

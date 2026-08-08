@@ -6,11 +6,16 @@
  */
 
 import React, { useState } from 'react';
-import { UserEntity, UserRole } from '@saas-coach/types';
+import { SimulatedDatabaseStore } from '@saas-coach/database';
 
 // --- ADMIN DASHBOARD & METRICS VIEW ---
 
 export const AdminDashboardView: React.FC = () => {
+  // Canlı veritabanı durumunu oku
+  const activeUserCount = SimulatedDatabaseStore.users.size;
+  const auditLogsList = SimulatedDatabaseStore.auditLogs;
+  const activeModel = SimulatedDatabaseStore.modelConfig.selectedModel;
+
   return (
     <div className="min-h-screen bg-slate-950 text-white p-6 space-y-8 font-sans">
       {/* Üst Yönetici Başlığı */}
@@ -27,9 +32,9 @@ export const AdminDashboardView: React.FC = () => {
       {/* Finansal & AI Metrikleri Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl">
-          <p className="text-xs text-slate-400 uppercase tracking-wider">Toplam Kullanıcı</p>
-          <h3 className="text-3xl font-extrabold mt-2 text-white">12.450</h3>
-          <p className="text-xs text-green-400 mt-1">▲ Bugün +142 yeni öğrenci</p>
+          <p className="text-xs text-slate-400 uppercase tracking-wider">Aktif Kullanıcı</p>
+          <h3 className="text-3xl font-extrabold mt-2 text-white">{activeUserCount} Öğrenci</h3>
+          <p className="text-xs text-green-400 mt-1">▲ Canlı oturum izleniyor</p>
         </div>
 
         <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl">
@@ -39,55 +44,50 @@ export const AdminDashboardView: React.FC = () => {
         </div>
 
         <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl">
-          <p className="text-xs text-slate-400 uppercase tracking-wider">Bugün Harcanan AI Token</p>
-          <h3 className="text-3xl font-extrabold mt-2 text-purple-400">4.120.450</h3>
-          <p className="text-xs text-slate-400 mt-1">Maliyet: $24.84 (GPT-4o ağırlıklı)</p>
+          <p className="text-xs text-slate-400 uppercase tracking-wider">Toplam İşlem Logu</p>
+          <h3 className="text-3xl font-extrabold mt-2 text-purple-400">{auditLogsList.length} Log</h3>
+          <p className="text-xs text-slate-400 mt-1">Audit Log tablosu senkronize</p>
         </div>
 
         <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl">
           <p className="text-xs text-slate-400 uppercase tracking-wider">Sistem Sağlık Durumu</p>
           <h3 className="text-3xl font-extrabold mt-2 text-blue-400">99.98%</h3>
-          <p className="text-xs text-green-400 mt-1">Tüm API ve DB servisleri çalışır durumda</p>
+          <p className="text-xs text-green-400 mt-1">Tüm API ve DB servisleri çalışıyor</p>
         </div>
       </div>
 
-      {/* Model Durumları ve AI Sağlayıcı Fallback Monitorü */}
+      {/* Son Sistem Günlükleri ve Model Fallback Monitorü */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl space-y-4">
-          <h3 className="text-lg font-bold">Aktif AI Sağlayıcı ve Fallback Zinciri</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center p-4 bg-white/5 rounded-xl">
-              <div>
-                <h4 className="font-semibold text-blue-400">1. Birincil Sağlayıcı: OpenAI (GPT-4o)</h4>
-                <p className="text-xs text-slate-400">Ortalama yanıt süresi: 1240ms | Başarı Oranı: %99.4</p>
+          <h3 className="text-lg font-bold">Son Audit Logları (Sistem İşlemleri)</h3>
+          <div className="space-y-2 overflow-y-auto max-h-60">
+            {auditLogsList.slice().reverse().map((log, index) => (
+              <div key={index} className="p-3 bg-white/5 rounded-xl border border-white/5 text-xs flex justify-between items-center">
+                <div>
+                  <span className="font-semibold text-purple-400 font-mono">[{log.action.toUpperCase()}]</span>
+                  <span className="text-slate-300 ml-2">User: {log.userId}</span>
+                  <p className="text-[10px] text-slate-500 mt-1">Details: {JSON.stringify(log.details)}</p>
+                </div>
+                <span className="text-[10px] text-slate-400">{new Date(log.timestamp).toLocaleTimeString()}</span>
               </div>
-              <span className="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-1 rounded border border-green-500/20">AKTİF</span>
-            </div>
-
-            <div className="flex justify-between items-center p-4 bg-white/5 rounded-xl">
-              <div>
-                <h4 className="font-semibold text-purple-400">2. İkincil Sağlayıcı: Claude (Sonnet 3.5)</h4>
-                <p className="text-xs text-slate-400">Hata durumunda otomatik yönlendirilecek model</p>
-              </div>
-              <span className="text-xs font-bold text-slate-400 bg-white/5 px-2 py-1 rounded">YEDEK</span>
-            </div>
+            ))}
           </div>
         </div>
 
         <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl space-y-4">
-          <h3 className="text-lg font-bold text-purple-300">Gereksinim / Disk Kotası</h3>
+          <h3 className="text-lg font-bold text-purple-300">Aktif Yapay Zekâ Modeli</h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between border-b border-white/5 pb-2">
-              <span className="text-slate-400">PostgreSQL Yükü:</span>
-              <span className="font-mono">%14 (Index Ok)</span>
+              <span className="text-slate-400">Model:</span>
+              <span className="font-mono text-blue-400 uppercase">{activeModel}</span>
             </div>
             <div className="flex justify-between border-b border-white/5 pb-2">
-              <span className="text-slate-400">Redis Cache Hit:</span>
-              <span className="font-mono">%92.4</span>
+              <span className="text-slate-400">Yedek Sağlayıcı:</span>
+              <span className="font-mono uppercase">{SimulatedDatabaseStore.modelConfig.fallbackProvider}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Günlük Hata Logu:</span>
-              <span className="font-mono text-green-400">0 Kritik Hata</span>
+              <span className="text-slate-400">Temperature:</span>
+              <span className="font-mono text-green-400">{SimulatedDatabaseStore.modelConfig.temperature}</span>
             </div>
           </div>
         </div>
@@ -99,11 +99,26 @@ export const AdminDashboardView: React.FC = () => {
 // --- SYSTEM PROMPT & MODEL PARAMETER MANAGEMENT VIEW ---
 
 export const AdminPromptControlView: React.FC = () => {
-  const [temperature, setTemperature] = useState(0.7);
-  const [selectedModel, setSelectedModel] = useState('gpt-4o');
-  const [activePrompt, setActivePrompt] = useState(
-    `Sen Türkiye'deki sınavlara hazırlanan öğrencilere premium koçluk yapan akıllı bir yapay zekâ eğitim koçusun.`
-  );
+  const [temperature, setTemperature] = useState(SimulatedDatabaseStore.modelConfig.temperature);
+  const [selectedModel, setSelectedModel] = useState(SimulatedDatabaseStore.modelConfig.selectedModel);
+  const [activePrompt, setActivePrompt] = useState(SimulatedDatabaseStore.activePrompt);
+
+  const handleSaveChanges = () => {
+    SimulatedDatabaseStore.modelConfig.temperature = temperature;
+    SimulatedDatabaseStore.modelConfig.selectedModel = selectedModel;
+    SimulatedDatabaseStore.activePrompt = activePrompt;
+
+    SimulatedDatabaseStore.auditLogs.push({
+      userId: 'admin_user',
+      action: 'admin_prompt_updated',
+      timestamp: new Date(),
+      details: { temperature, selectedModel },
+      ip: '127.0.0.1',
+      browser: 'Admin Console'
+    });
+
+    alert('Yapay zeka sistem parametreleri ve sistem promptu başarıyla güncellendi!');
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-6 space-y-8 font-sans">
@@ -112,8 +127,11 @@ export const AdminPromptControlView: React.FC = () => {
           <h1 className="text-3xl font-extrabold tracking-tight">AI Prompt & Model Kontrol Merkezi</h1>
           <p className="text-sm text-slate-400 mt-1">Karakterleri, kuralları ve parametreleri kod yazmadan dinamik olarak değiştirin.</p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors">
-          Yeni Versiyon Olarak Kaydet (v1.4)
+        <button
+          onClick={handleSaveChanges}
+          className="bg-blue-600 hover:bg-blue-700 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all hover:shadow-[0_0_15px_rgba(37,99,235,0.4)]"
+        >
+          Sistem Ayarlarını Kaydet (v1.4)
         </button>
       </div>
 

@@ -6,7 +6,8 @@
   "dependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "@saas-coach/types": "workspace:*"
+    "@saas-coach/types": "workspace:*",
+    "@saas-coach/database": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

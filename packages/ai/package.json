@@ -5,6 +5,7 @@
   "main": "index.ts",
   "types": "index.ts",
   "dependencies": {
-    "@saas-coach/types": "workspace:*"
+    "@saas-coach/types": "workspace:*",
+    "@saas-coach/utils": "workspace:*"
   }
 }

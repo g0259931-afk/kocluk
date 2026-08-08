@@ -1,14 +1,19 @@
 /**
  * @file apps/web/index.tsx
- * @description AI SaaS Student Coach Platformu - Kullanıcı Arayüzü Uygulaması.
- * Premium tasarım dilini (Glassmorphism, Neon Blur ve Minimalizm) yansıtan
- * Landing Page (Tanıtım Sayfası) ve 8 Adımlı İlk Kurulum Sihirbazı (Onboarding Wizard).
+ * @description AI SaaS Student Coach Platformu - Entegre Premium Tek Sayfa Uygulaması (SPA).
+ * Landing Page, 8-Adımlı Sihirbaz, Dashboard, Dersler, Canlı Sohbet ve 50+ Alanı Yöneten Ayarlar Ekranı.
+ * Geliştirici Yönergesi Gereği: Frontend kesinlikle veritabanı veya AI sınıflarına doğrudan erişmez,
+ * tüm isteklerini standart HTTP fetch() istekleri ile Next.js Server-Side API'sine iletir.
  */
 
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import { OnboardingSteps } from '@saas-coach/shared';
 import { formatDateTurkish, formatStudyDuration } from '@saas-coach/utils';
-import { StudentProfileEntity } from '@saas-coach/types';
+import { StudentProfileEntity, LessonEntity, AIMessageEntity } from '@saas-coach/types';
+
+// --- SUB-COMPONENTS IMPORT/EXPORTS ---
+import { MainDashboardView, LessonsManagementView } from './dashboard';
+import { PremiumChatView, StudentProfileSettingsView } from './chat_settings';
 
 // --- PREMIUM LANDING PAGE COMPONENT ---
 
@@ -240,7 +245,7 @@ export const OnboardingWizard: React.FC<{ onComplete: (profile: Partial<StudentP
                 type="text"
                 placeholder="Örn: Şahin"
                 value={formData.preferred_address || ''}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, preferred_address: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, preferred_address: e.target.value })}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
               />
             </div>
@@ -272,7 +277,7 @@ export const OnboardingWizard: React.FC<{ onComplete: (profile: Partial<StudentP
                 type="text"
                 placeholder="Örn: YKS Sayısal"
                 value={formData.target_exam || ''}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, target_exam: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, target_exam: e.target.value })}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
               />
             </div>
@@ -287,14 +292,14 @@ export const OnboardingWizard: React.FC<{ onComplete: (profile: Partial<StudentP
                   type="text"
                   placeholder="Üniversite (Örn: Boğaziçi Üniversitesi)"
                   value={formData.target_university || ''}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, target_university: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, target_university: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
                 />
                 <input
                   type="text"
                   placeholder="Bölüm (Örn: Bilgisayar Mühendisliği)"
                   value={formData.target_department || ''}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, target_department: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, target_department: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
                 />
               </div>
@@ -309,7 +314,7 @@ export const OnboardingWizard: React.FC<{ onComplete: (profile: Partial<StudentP
                 type="number"
                 placeholder="Örn: 240"
                 value={formData.avg_daily_study_minutes || ''}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, avg_daily_study_minutes: Number(e.target.value) })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, avg_daily_study_minutes: Number(e.target.value) })}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
               />
               <p className="text-xs text-slate-500 mt-2">
@@ -327,14 +332,14 @@ export const OnboardingWizard: React.FC<{ onComplete: (profile: Partial<StudentP
                   type="text"
                   placeholder="En Güçlü Ders (Örn: Matematik)"
                   value={formData.strongest_lesson || ''}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, strongest_lesson: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, strongest_lesson: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
                 />
                 <input
                   type="text"
                   placeholder="En Zayıf Ders (Örn: Fizik)"
                   value={formData.weakest_lesson || ''}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, weakest_lesson: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, weakest_lesson: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
                 />
               </div>
@@ -390,6 +395,262 @@ export const OnboardingWizard: React.FC<{ onComplete: (profile: Partial<StudentP
             {currentStep === 8 ? 'Kurulumu Tamamla' : 'Devam Et'}
           </button>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// --- CORE CLIENT-SIDE API FETCH WRAPPER (REAL HTTP) ---
+
+async function fetchFromBackend(route: string, method: 'GET' | 'POST' | 'PUT', body?: any): Promise<any> {
+  const response = await window.fetch(`/api/v1${route}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-user-id': 'default_student_user'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  return await response.json();
+}
+
+// --- CORE APP CONTAINER ---
+
+export const AppContainer: React.FC = () => {
+  const [screen, setScreen] = useState<'landing' | 'onboarding' | 'dashboard' | 'lessons' | 'chat' | 'settings'>('landing');
+
+  // Uygulama Durumları (States)
+  const [profile, setProfile] = useState<StudentProfileEntity | null>(null);
+  const [lessons, setLessons] = useState<LessonEntity[]>([]);
+  const [chatMessages, setMessages] = useState<AIMessageEntity[]>([]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Veritabanı ve AI işlemlerini REST API üzerinden tetikler (Clean Architecture)
+  useEffect(() => {
+    async function loadData() {
+      const profileRes = await fetchFromBackend('/profile/settings', 'GET');
+      const lessonsRes = await fetchFromBackend('/lessons', 'GET');
+
+      if (profileRes.success) setProfile(profileRes.data);
+      if (lessonsRes.success) setLessons(lessonsRes.data);
+
+      setMessages([
+        {
+          id: 'msg_welcome',
+          conversation_id: 'conv_1',
+          sender_role: 'assistant',
+          content: `Merhaba Şahin! Ben senin yapay zekâ eğitim koçunum. Hedefin olan Boğaziçi Üniversitesi Bilgisayar Mühendisliği için bugünkü çalışma planını hazırladım. Kafana takılan tüm konuları bana sorabilirsin!`,
+          created_at: new Date(),
+          tokens_used: 150
+        }
+      ]);
+    }
+    loadData();
+  }, []);
+
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4500);
+  };
+
+  // Onboarding Sihirbazı Tamamlandığında
+  const handleOnboardingComplete = async (onboardedData: Partial<StudentProfileEntity>) => {
+    const res = await fetchFromBackend('/profile/settings', 'PUT', onboardedData);
+    if (res.success) {
+      setProfile(res.data);
+
+      // İlk dersleri de API üzerinden oluştur
+      if (onboardedData.strongest_lesson) {
+        await fetchFromBackend('/lessons', 'POST', { name: onboardedData.strongest_lesson });
+      }
+      if (onboardedData.weakest_lesson) {
+        await fetchFromBackend('/lessons', 'POST', { name: onboardedData.weakest_lesson });
+      }
+
+      const lessonsRes = await fetchFromBackend('/lessons', 'GET');
+      if (lessonsRes.success) setLessons(lessonsRes.data);
+
+      triggerToast('Sihirbaz başarıyla tamamlandı! Profiliniz ve ders hiyerarşiniz oluşturuldu.');
+      setScreen('dashboard');
+    }
+  };
+
+  // Ders Ekleme İşlemi
+  const handleAddLesson = async (name: string) => {
+    const res = await fetchFromBackend('/lessons', 'POST', { name });
+    if (res.success) {
+      const lessonsRes = await fetchFromBackend('/lessons', 'GET');
+      if (lessonsRes.success) setLessons(lessonsRes.data);
+      triggerToast(`"${name}" dersi başarıyla eklendi.`);
+    }
+  };
+
+  // Profil El ile Güncellendiğinde
+  const handleSaveProfile = async (newProfile: StudentProfileEntity) => {
+    const res = await fetchFromBackend('/profile/settings', 'PUT', newProfile);
+    if (res.success) {
+      setProfile(res.data);
+      triggerToast('Profil ayarlarınız başarıyla el ile güncellendi.');
+    }
+  };
+
+  // Mesaj Gönderildiğinde (API-First Çift AI Akışı)
+  const handleSendMessage = async (text: string) => {
+    // 1. Öğrenci mesajını ekrana bas
+    const userMsgId = `msg_usr_${Date.now()}`;
+    const newUserMessage: AIMessageEntity = {
+      id: userMsgId,
+      conversation_id: 'conv_1',
+      sender_role: 'user',
+      content: text,
+      created_at: new Date(),
+      tokens_used: Math.ceil(text.length / 4)
+    };
+
+    const updatedMessages = [...chatMessages, newUserMessage];
+    setMessages(updatedMessages);
+
+    // 2. Mesajı API üzerinden Backend'e gönder (Yapay Zekâ ve Veritabanı işlemleri tamamen backend'de döner)
+    const res = await fetchFromBackend('/chat/message', 'POST', { message: text });
+    if (res.success) {
+      const { response, profileUpdates, newProfile } = res.data;
+
+      // Eğer AI-1 sessizce profilde yeni bir şey saptadıysa, profil state'ini güncelle ve bildir
+      if (profileUpdates) {
+        setProfile(newProfile);
+        const fieldsStr = Object.keys(profileUpdates).map(f => {
+          if (f === 'prefers_morning') return 'Sabah Çalışma Alışkanlığı';
+          if (f === 'prefers_night') return 'Gece Çalışma Alışkanlığı';
+          if (f === 'weakest_lesson') return 'Zayıf Hissettiği Ders';
+          if (f === 'strongest_lesson') return 'Güçlü Hissettiği Ders';
+          if (f === 'target_department') return 'Hedeflenen Bölüm';
+          if (f === 'target_university') return 'Hedeflenen Üniversite';
+          return f;
+        }).join(', ');
+        triggerToast(`✨ [AI-1 Analizi] Mesajınızdan yeni bir bilgi saptandı ve profiliniz otomatik güncellendi: ${fieldsStr}`);
+      }
+
+      // 3. Premium Yazma Akışı Simülasyonu (Streaming effect)
+      const assistantMsgId = `msg_ai_${Date.now()}`;
+      const newAssistantMessage: AIMessageEntity = {
+        id: assistantMsgId,
+        conversation_id: 'conv_1',
+        sender_role: 'assistant',
+        content: '',
+        created_at: new Date(),
+        tokens_used: Math.ceil(response.length / 4) + 150
+      };
+
+      setMessages([...updatedMessages, newAssistantMessage]);
+
+      let charIndex = 0;
+      const interval = setInterval(() => {
+        charIndex += 4;
+        const chunk = response.slice(0, charIndex);
+
+        setMessages((prev) =>
+          prev.map(m => m.id === assistantMsgId ? { ...m, content: chunk } : m)
+        );
+
+        if (charIndex >= response.length) {
+          clearInterval(interval);
+        }
+      }, 15);
+    } else {
+      triggerToast(`Hata: ${res.error?.message || 'Mesaj gönderilemedi.'}`);
+    }
+  };
+
+  const handleRegenerate = () => {
+    if (chatMessages.length > 1) {
+      const lastUserMessage = [...chatMessages].reverse().find(m => m.sender_role === 'user');
+      if (lastUserMessage) {
+        handleSendMessage(lastUserMessage.content);
+      }
+    }
+  };
+
+  if (!profile) {
+    return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white font-mono">Veriler Yükleniyor...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col md:flex-row font-sans">
+      {/* Premium Bildirim Toasts */}
+      {toastMessage && (
+        <div className="fixed top-6 right-6 z-50 max-w-sm bg-gradient-to-r from-blue-600/90 to-purple-600/90 backdrop-blur-md border border-white/10 p-4 rounded-xl shadow-2xl text-sm leading-relaxed transition-all duration-300 animate-slide-in">
+          {toastMessage}
+        </div>
+      )}
+
+      {/* Sol Sidebar (Gezinti Menüsü) - Sadece Dashboard içindeyken gösterilir */}
+      {screen !== 'landing' && screen !== 'onboarding' && (
+        <nav className="w-full md:w-64 border-r border-white/10 bg-slate-900/40 backdrop-blur-md p-6 space-y-8 flex flex-col justify-between">
+          <div className="space-y-8">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => setScreen('dashboard')}>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">COACH.AI</span>
+              <span className="bg-purple-500/10 text-purple-400 text-[9px] px-1.5 py-0.5 rounded border border-purple-500/20 font-bold uppercase">STUDENT</span>
+            </div>
+
+            <div className="space-y-1.5 text-sm">
+              {[
+                { id: 'dashboard', label: 'Ana Dashboard', icon: '📊' },
+                { id: 'chat', label: 'AI Koç Sohbeti', icon: '💬' },
+                { id: 'lessons', label: 'Derslerim', icon: '📚' },
+                { id: 'settings', label: 'Profil Ayarlarım', icon: '⚙️' }
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setScreen(item.id as any)}
+                  className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 font-semibold ${screen === item.id ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-white/10 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}`}
+                >
+                  <span>{item.icon}</span> {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => setScreen('landing')}
+            className="w-full bg-white/5 border border-white/10 hover:bg-white/10 py-2.5 rounded-xl text-xs text-slate-300 transition-colors"
+          >
+            Sistemden Çıkış Yap
+          </button>
+        </nav>
+      )}
+
+      {/* Ana Ekran Geçiş Alanı */}
+      <div className="flex-1 overflow-y-auto">
+        {screen === 'landing' && <LandingPage onGetStarted={() => setScreen('onboarding')} />}
+        {screen === 'onboarding' && <OnboardingWizard onComplete={handleOnboardingComplete} />}
+        {screen === 'dashboard' && (
+          <MainDashboardView
+            profile={profile}
+            lessons={lessons}
+            onNavigateToLessons={() => setScreen('lessons')}
+          />
+        )}
+        {screen === 'lessons' && (
+          <LessonsManagementView
+            lessons={lessons}
+            onAddLesson={handleAddLesson}
+          />
+        )}
+        {screen === 'chat' && (
+          <PremiumChatView
+            messages={chatMessages}
+            onSendMessage={handleSendMessage}
+            onRegenerate={handleRegenerate}
+          />
+        )}
+        {screen === 'settings' && (
+          <StudentProfileSettingsView
+            profile={profile}
+            onSaveProfile={handleSaveProfile}
+          />
+        )}
       </div>
     </div>
   );

@@ -1,27 +1,24 @@
 /**
  * @file apps/backend/index.ts
- * @description SaaS Student Coach Platformu Backend API Katmanı.
+ * @description SaaS Student Coach Platformu Backend API Sunucusu / Route Dispatcher.
  * Clean Architecture ve API-First yaklaşımlarına uygun olarak geliştirilmiştir.
- * Tüm HTTP isteklerini standardlaştırılmış JSON formatında karşılar ve yanıtlar.
+ * Tüm veritabanı (Supabase) ve yapay zekâ (DualAIEngine) işlemleri burada yürütülür.
+ * Frontend kesinlikle veritabanı veya yapay zekâ kütüphanelerine doğrudan erişmez; API üzerinden haberleşir.
  */
 
 import {
   APIResponse,
   APIErrorResponse,
-  UserRole,
   StudentProfileEntity,
-  UserEntity
+  LessonEntity
 } from '@saas-coach/types';
 import { AuthServiceFactory } from '@saas-coach/auth';
 import { DatabaseFactory } from '@saas-coach/database';
 import { DualAIEngine, TokenEconomyEngine } from '@saas-coach/ai';
 import { sanitizeInput, ErrorCodes } from '@saas-coach/utils';
 
-// --- MIDDLEWARES & HELPERS ---
+// --- API RESPONSE FORMATTERS ---
 
-/**
- * Standardize başarılı API cevabı üreten yardımcı fonksiyon.
- */
 export function sendSuccess<T>(data: T, message?: string, meta?: Record<string, any>): APIResponse<T> {
   return {
     success: true,
@@ -32,9 +29,6 @@ export function sendSuccess<T>(data: T, message?: string, meta?: Record<string, 
   };
 }
 
-/**
- * Standardize hatalı API cevabı üreten yardımcı fonksiyon.
- */
 export function sendError(code: string, message: string, details?: any[]): APIErrorResponse {
   return {
     success: false,
@@ -47,155 +41,141 @@ export function sendError(code: string, message: string, details?: any[]): APIEr
   };
 }
 
-/**
- * Rate limiting kontrolü simülasyonu.
- */
-export class RateLimiter {
-  private static store: Record<string, number[]> = {};
+// --- CENTRALIZED BACKEND API GATEWAY ---
 
-  static checkLimit(clientIp: string, limit: number, windowMs: number): boolean {
-    const now = Date.now();
-    if (!this.store[clientIp]) {
-      this.store[clientIp] = [];
-    }
-    // Süresi dolan istekleri temizle
-    this.store[clientIp] = this.store[clientIp].filter(timestamp => now - timestamp < windowMs);
-
-    if (this.store[clientIp].length >= limit) {
-      return false; // Limit aşıldı
-    }
-    this.store[clientIp].push(now);
-    return true;
-  }
-}
-
-// --- API CONTROLLERS ---
-
-export class BackendApiController {
-  private authService = AuthServiceFactory.create('firebase');
-  private dbAdapter = DatabaseFactory.create('supabase');
-  private aiEngine = new DualAIEngine();
+export class BackendApiService {
+  private static authService = AuthServiceFactory.create('firebase');
+  private static dbAdapter = DatabaseFactory.create('supabase');
+  private static aiEngine = new DualAIEngine();
 
   /**
-   * POST /api/v1/auth/login
-   * E-posta ve şifre ile oturum açma endpoint'i.
+   * Birleştirilmiş HTTP/REST Router simülasyonu.
+   * Frontend'den gelen istekleri karşılayarak ilgili katmanlara yönlendirir.
    */
-  async handleLogin(reqBody: any, clientIp: string): Promise<APIResponse | APIErrorResponse> {
-    // 1. Rate Limit Kontrolü (Dakikada maks 5 istek)
-    if (!RateLimiter.checkLimit(clientIp, 5, 60 * 1000)) {
-      return sendError(ErrorCodes.AUTH_UNAUTHORIZED, 'Çok fazla giriş denemesi yapıldı. Lütfen daha sonra tekrar deneyin.');
-    }
-
-    const { email, password } = reqBody;
-    if (!email || !password) {
-      return sendError(ErrorCodes.AUTH_INVALID_CREDENTIALS, 'E-posta ve şifre alanları zorunludur.');
-    }
+  static async request(
+    route: string,
+    method: 'GET' | 'POST' | 'PUT',
+    body?: any,
+    userId = 'default_student_user',
+    clientIp = '127.0.0.1'
+  ): Promise<any> {
+    console.log(`[Backend API Request] Route: ${route} | Method: ${method} | User: ${userId}`);
 
     try {
-      const session = await this.authService.signInWithEmail(sanitizeInput(email), password);
-      await this.dbAdapter.logAction(session.userId, 'login_success', { email }, clientIp);
-      return sendSuccess(session, 'Giriş işlemi başarıyla tamamlandı.');
-    } catch (err) {
-      return sendError(ErrorCodes.AUTH_INVALID_CREDENTIALS, 'Geçersiz e-posta adresi veya şifre.');
-    }
-  }
-
-  /**
-   * POST /api/v1/chat/message
-   * Sohbet ekranından gönderilen mesajları işler ve Çift AI Motorunu tetikler.
-   */
-  async handleChatMessage(userId: string, userMessage: string, clientIp: string): Promise<APIResponse | APIErrorResponse> {
-    // 1. Girdi Temizleme (Sanitization)
-    const cleanMessage = sanitizeInput(userMessage);
-    if (!cleanMessage) {
-      return sendError(ErrorCodes.SYSTEM_UNEXPECTED, 'Mesaj içeriği boş olamaz.');
-    }
-
-    try {
-      // 2. Kullanıcı Veritabanı Bilgilerini Getir
-      const user = await this.dbAdapter.findById(userId);
-      const profile = await this.dbAdapter.findProfileByUserId(userId);
-      const lessons = await this.dbAdapter.findAllByUserId(userId);
-
-      if (!user || !profile) {
-        return sendError(ErrorCodes.USER_NOT_FOUND, 'Öğrenci profili bulunamadı.');
+      // 1. GİRİŞ ENDPOINT'İ (/api/v1/auth/login)
+      if (route === '/api/v1/auth/login' && method === 'POST') {
+        const { email, password } = body || {};
+        if (!email || !password) {
+          return sendError(ErrorCodes.AUTH_INVALID_CREDENTIALS, 'E-posta ve şifre zorunludur.');
+        }
+        const session = await this.authService.signInWithEmail(sanitizeInput(email), password);
+        await this.dbAdapter.logAction(session.userId, 'login_success', { email }, clientIp);
+        return sendSuccess(session, 'Giriş başarılı.');
       }
 
-      // 3. Token Bütçe Kontrolü
-      const wallet: any = { used_today: 4500, total_limit: 500000 }; // Mock Wallet
-      if (!TokenEconomyEngine.checkBudgetLimit(wallet.used_today, wallet.total_limit)) {
-        return sendError(ErrorCodes.TOKEN_INSUFFICIENT, 'Günlük yapay zekâ kullanım limitinizi aştınız.');
+      // 2. PROFİL AYARLARINI GETİRME (GET /api/v1/profile/settings)
+      if (route === '/api/v1/profile/settings' && method === 'GET') {
+        const profile = await this.dbAdapter.findProfileByUserId(userId);
+        if (!profile) {
+          return sendError(ErrorCodes.USER_NOT_FOUND, 'Öğrenci profili bulunamadı.');
+        }
+        return sendSuccess(profile);
       }
 
-      // 4. AI-1: Arka Planda Sessiz Profil Analiz Motoru (Çift AI)
-      const profileUpdates = await this.aiEngine.runProfileAnalysis(cleanMessage, profile);
-      if (Object.keys(profileUpdates).length > 0) {
-        // Yeni bir öğrenme veya alışkanlık bilgisi keşfedilirse profili sessizce güncelle
+      // 3. PROFİL AYARLARINI GÜNCELLEME (PUT /api/v1/profile/settings)
+      if (route === '/api/v1/profile/settings' && method === 'PUT') {
+        const currentProfile = await this.dbAdapter.findProfileByUserId(userId);
+        if (!currentProfile) {
+          return sendError(ErrorCodes.USER_NOT_FOUND, 'Öğrenci profili bulunamadı.');
+        }
         const updatedProfile: StudentProfileEntity = {
-          ...profile,
-          ...profileUpdates,
+          ...currentProfile,
+          ...body,
           updated_at: new Date(),
-          version: profile.version + 1
+          version: currentProfile.version + 1
         };
-        await this.dbAdapter.saveProfile(updatedProfile);
-        await this.dbAdapter.logAction(userId, 'profile_auto_updated_by_ai', profileUpdates, clientIp);
+        const saved = await this.dbAdapter.saveProfile(updatedProfile);
+        await this.dbAdapter.logAction(userId, 'settings_updated_manually', { keys: Object.keys(body || {}) }, clientIp);
+        return sendSuccess(saved, 'Profil ayarları başarıyla kaydedildi.');
       }
 
-      // 5. AI-2: Koç Motorundan Öğrenciye Özel Yanıt Üret
-      const coachResponse = await this.aiEngine.runCoachEngine(profile, lessons, cleanMessage);
-
-      // 6. İşlemi Günlüğe Kaydet ve Başarılı Yanıt Dön
-      await this.dbAdapter.logAction(userId, 'chat_message_sent', { messageLength: cleanMessage.length }, clientIp);
-
-      return sendSuccess({
-        response: coachResponse,
-        profileWasUpdated: Object.keys(profileUpdates).length > 0
-      }, 'Yapay zekâ koç yanıtı başarıyla üretildi.');
-
-    } catch (err) {
-      return sendError(ErrorCodes.AI_API_ERROR, 'AI motoru yanıt üretirken beklenmeyen bir hata ile karşılaştı.');
-    }
-  }
-
-  /**
-   * GET /api/v1/profile/settings
-   * 50+ Öğrenci profil alanını getirir.
-   */
-  async handleGetSettings(userId: string): Promise<APIResponse | APIErrorResponse> {
-    try {
-      const profile = await this.dbAdapter.findProfileByUserId(userId);
-      if (!profile) {
-        return sendError(ErrorCodes.USER_NOT_FOUND, 'Öğrenci profil ayarları bulunamadı.');
-      }
-      return sendSuccess(profile);
-    } catch (err) {
-      return sendError(ErrorCodes.SYSTEM_UNEXPECTED, 'Ayarlar yüklenirken bir hata oluştu.');
-    }
-  }
-
-  /**
-   * PUT /api/v1/profile/settings
-   * Kullanıcının profil alanlarını el ile güncellemesini sağlar.
-   */
-  async handleUpdateSettings(userId: string, newSettings: Partial<StudentProfileEntity>): Promise<APIResponse | APIErrorResponse> {
-    try {
-      const currentProfile = await this.dbAdapter.findProfileByUserId(userId);
-      if (!currentProfile) {
-        return sendError(ErrorCodes.USER_NOT_FOUND, 'Öğrenci profil ayarları bulunamadı.');
+      // 4. DERSLERİ GETİRME (GET /api/v1/lessons)
+      if (route === '/api/v1/lessons' && method === 'GET') {
+        const list = await this.dbAdapter.findAllByUserId(userId);
+        return sendSuccess(list);
       }
 
-      const updatedProfile: StudentProfileEntity = {
-        ...currentProfile,
-        ...newSettings,
-        updated_at: new Date(),
-        version: currentProfile.version + 1
-      };
+      // 5. DERS EKLEME (POST /api/v1/lessons)
+      if (route === '/api/v1/lessons' && method === 'POST') {
+        const { name } = body || {};
+        if (!name) {
+          return sendError(ErrorCodes.SYSTEM_UNEXPECTED, 'Ders adı boş olamaz.');
+        }
+        const newLesson: LessonEntity = {
+          id: `lesson_${Math.random().toString(36).substr(2, 9)}`,
+          user_id: userId,
+          name: sanitizeInput(name),
+          created_at: new Date(),
+          updated_at: new Date(),
+          deleted_at: null,
+          status: 'not_started'
+        };
+        const saved = await this.dbAdapter.saveLesson(newLesson);
+        await this.dbAdapter.logAction(userId, 'lesson_added', { name }, clientIp);
+        return sendSuccess(saved, 'Ders başarıyla oluşturuldu.');
+      }
 
-      const saved = await this.dbAdapter.saveProfile(updatedProfile);
-      await this.dbAdapter.logAction(userId, 'settings_manually_updated', { updatedFields: Object.keys(newSettings) });
-      return sendSuccess(saved, 'Profil ayarlarınız başarıyla kaydedildi.');
+      // 6. CHATBOT MESAJ GÖNDERİMİ VE SESSİZ ÇİFT AI AKIŞI (POST /api/v1/chat/message)
+      if (route === '/api/v1/chat/message' && method === 'POST') {
+        const { message } = body || {};
+        const cleanMsg = sanitizeInput(message || '');
+        if (!cleanMsg) {
+          return sendError(ErrorCodes.SYSTEM_UNEXPECTED, 'Mesaj içeriği boş olamaz.');
+        }
+
+        const profile = await this.dbAdapter.findProfileByUserId(userId);
+        const lessons = await this.dbAdapter.findAllByUserId(userId);
+
+        if (!profile) {
+          return sendError(ErrorCodes.USER_NOT_FOUND, 'Kullanıcı profili bulunamadı.');
+        }
+
+        // Token bütçe kontrolü
+        const wallet = { used_today: 4500, total_limit: 500000 };
+        if (!TokenEconomyEngine.checkBudgetLimit(wallet.used_today, wallet.total_limit)) {
+          return sendError(ErrorCodes.TOKEN_INSUFFICIENT, 'Yapay zekâ kullanım limitinizi aştınız.');
+        }
+
+        // AI-1: Profil Analiz Motoru (Sessiz Çalışma)
+        const profileUpdates = await this.aiEngine.runProfileAnalysis(cleanMsg, profile);
+        let updatedProfile = profile;
+        if (Object.keys(profileUpdates).length > 0) {
+          updatedProfile = {
+            ...profile,
+            ...profileUpdates,
+            updated_at: new Date(),
+            version: profile.version + 1
+          };
+          await this.dbAdapter.saveProfile(updatedProfile);
+          await this.dbAdapter.logAction(userId, 'profile_auto_updated_by_ai', profileUpdates, clientIp);
+        }
+
+        // AI-2: Koç Motoru (Kişiselleştirilmiş Yanıt Üretimi)
+        const coachResponse = await this.aiEngine.runCoachEngine(updatedProfile, lessons, cleanMsg);
+        await this.dbAdapter.logAction(userId, 'chat_message_sent', { length: cleanMsg.length }, clientIp);
+
+        return sendSuccess({
+          response: coachResponse,
+          profileUpdates: Object.keys(profileUpdates).length > 0 ? profileUpdates : null,
+          newProfile: updatedProfile
+        }, 'AI koç yanıtı başarıyla üretildi.');
+      }
+
+      return sendError(ErrorCodes.SYSTEM_UNEXPECTED, 'Endpoint veya HTTP Metodu desteklenmiyor.');
     } catch (err) {
-      return sendError(ErrorCodes.SYSTEM_UNEXPECTED, 'Ayarlar kaydedilirken bir hata oluştu.');
+      console.error('[Backend API Error]', err);
+      return sendError(ErrorCodes.SYSTEM_UNEXPECTED, 'Beklenmeyen bir sunucu hatası oluştu.');
     }
   }
 }
+export { ErrorCodes };
