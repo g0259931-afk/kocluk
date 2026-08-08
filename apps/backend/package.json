@@ -1,0 +1,13 @@
+{
+  "name": "@saas-coach/backend",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "@saas-coach/types": "workspace:*",
+    "@saas-coach/auth": "workspace:*",
+    "@saas-coach/database": "workspace:*",
+    "@saas-coach/ai": "workspace:*",
+    "@saas-coach/utils": "workspace:*"
+  }
+}

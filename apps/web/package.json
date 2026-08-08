@@ -1,0 +1,17 @@
+{
+  "name": "@saas-coach/web",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.tsx",
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "@saas-coach/types": "workspace:*",
+    "@saas-coach/shared": "workspace:*",
+    "@saas-coach/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0"
+  }
+}
