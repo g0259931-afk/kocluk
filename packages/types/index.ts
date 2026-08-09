@@ -66,7 +66,7 @@ export interface StudentProfileEntity {
   // 1. Temel Bilgiler (Basic Information)
   birth_year: number | null;
   city: string | null;
-  school_level: 'ilkokul' | 'ortaokul' | 'lise' | 'TYT' | 'AYT' | 'YKS' | 'ünivesite' | 'mezun' | null;
+  school_level: 'ilkokul' | 'ortaokul' | 'lise' | 'TYT' | 'AYT' | 'YKS' | 'üniversite' | 'mezun' | null;
   school_type: string | null; // Fen Lisesi, Anadolu Lisesi vb.
   graduation_status: boolean | null;
 

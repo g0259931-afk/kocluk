@@ -18,7 +18,8 @@
     "@saas-coach/types": "workspace:*",
     "@saas-coach/shared": "workspace:*",
     "@saas-coach/utils": "workspace:*",
-    "@saas-coach/backend": "workspace:*"
+    "@saas-coach/backend": "workspace:*",
+    "@saas-coach/admin": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

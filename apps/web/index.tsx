@@ -2,8 +2,7 @@
  * @file apps/web/index.tsx
  * @description AI SaaS Student Coach Platformu - Entegre Premium Tek Sayfa Uygulaması (SPA).
  * Landing Page, 8-Adımlı Sihirbaz, Dashboard, Dersler, Canlı Sohbet ve 50+ Alanı Yöneten Ayarlar Ekranı.
- * Geliştirici Yönergesi Gereği: Frontend kesinlikle veritabanı veya AI sınıflarına doğrudan erişmez,
- * tüm isteklerini standart HTTP fetch() istekleri ile Next.js Server-Side API'sine iletir.
+ * Mobil için tam bir Mobil Uygulama (PWA) hissi, masaüstü için ise Premium Masaüstü Yazılımı görünümü sunar.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -19,7 +18,7 @@ import { PremiumChatView, StudentProfileSettingsView } from './chat_settings';
 
 export const LandingPage: React.FC<{ onGetStarted: () => void }> = ({ onGetStarted }) => {
   return (
-    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-purple-500 selection:text-white">
+    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-purple-500 selection:text-white relative overflow-hidden">
       {/* Gelecek Temalı Neon Arka Plan Işıkları (Neon Blurs) */}
       <div className="absolute top-20 left-10 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-80 right-20 w-80 h-80 bg-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
@@ -27,16 +26,15 @@ export const LandingPage: React.FC<{ onGetStarted: () => void }> = ({ onGetStart
       {/* Üst Menü (Navigation Bar) */}
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-slate-950/70 border-b border-white/10 px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold tracking-wider bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          <span className="text-xl font-bold tracking-wider bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-mono">
             COACH.AI
           </span>
-          <span className="bg-blue-500/10 text-blue-400 text-[10px] uppercase tracking-widest px-2 py-0.5 rounded border border-blue-500/20">
+          <span className="bg-blue-500/10 text-blue-400 text-[10px] uppercase tracking-widest px-2 py-0.5 rounded border border-blue-500/20 font-bold">
             PREMIUM SAAS
           </span>
         </div>
         <div className="hidden md:flex gap-8 text-sm text-slate-300">
           <a href="#features" className="hover:text-purple-400 transition-colors">Özellikler</a>
-          <a href="#how-it-works" className="hover:text-purple-400 transition-colors">Nasıl Çalışır?</a>
           <a href="#pricing" className="hover:text-purple-400 transition-colors">Fiyatlandırma</a>
           <a href="#faq" className="hover:text-purple-400 transition-colors">Sıkça Sorulanlar</a>
         </div>
@@ -53,11 +51,11 @@ export const LandingPage: React.FC<{ onGetStarted: () => void }> = ({ onGetStart
         <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight leading-tight max-w-4xl mx-auto">
           Yapay Zekâ Destekli <br />
           <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            Yeni Nesil Dijital Sınav Koçun
+            Yeni Nesil Sınav Koçun
           </span>
         </h1>
         <p className="mt-6 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
-          Türkiye'deki LGS, TYT, AYT, YKS ve üniversite sınavlarına özel; seni tanıyan, gelişimini saniye saniye izleyen ve her gün "Bugün ne çalışmalıyım?" sorusuna akıllıca yanıt veren yapay zekâ platformu.
+          Türkiye'deki LGS, TYT, AYT, YKS ve üniversite sınavlarına özel; seni tanıyan, gelişimini saniye saniye izleyen ve her gün "Bugün ne çalışmalıyım?" sorusuna yanıt veren yapay zekâ platformu.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <button
@@ -67,10 +65,10 @@ export const LandingPage: React.FC<{ onGetStarted: () => void }> = ({ onGetStart
             14 Gün Ücretsiz Dene
           </button>
           <a
-            href="#how-it-works"
+            href="#pricing"
             className="bg-white/5 border border-white/15 hover:bg-white/10 px-8 py-4 rounded-xl text-lg font-semibold transition-all inline-flex items-center gap-2 justify-center"
           >
-            Nasıl Çalışır? <span>↓</span>
+            Fiyatlandırma <span>↓</span>
           </a>
         </div>
 
@@ -414,10 +412,11 @@ async function fetchFromBackend(route: string, method: 'GET' | 'POST' | 'PUT', b
   return await response.json();
 }
 
-// --- CORE APP CONTAINER ---
+// --- CORE APP CONTAINER (WITH RESPONSIVE BottomNavigation) ---
 
 export const AppContainer: React.FC = () => {
   const [screen, setScreen] = useState<'landing' | 'onboarding' | 'dashboard' | 'lessons' | 'chat' | 'settings'>('landing');
+  const studentId = 'default_student_user';
 
   // Uygulama Durumları (States)
   const [profile, setProfile] = useState<StudentProfileEntity | null>(null);
@@ -512,7 +511,7 @@ export const AppContainer: React.FC = () => {
     const updatedMessages = [...chatMessages, newUserMessage];
     setMessages(updatedMessages);
 
-    // 2. Mesajı API üzerinden Backend'e gönder (Yapay Zekâ ve Veritabanı işlemleri tamamen backend'de döner)
+    // 2. Mesajı API üzerinden Backend'e gönder
     const res = await fetchFromBackend('/chat/message', 'POST', { message: text });
     if (res.success) {
       const { response, profileUpdates, newProfile } = res.data;
@@ -577,7 +576,7 @@ export const AppContainer: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col md:flex-row font-sans">
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col md:flex-row font-sans pb-20 md:pb-0 relative overflow-hidden">
       {/* Premium Bildirim Toasts */}
       {toastMessage && (
         <div className="fixed top-6 right-6 z-50 max-w-sm bg-gradient-to-r from-blue-600/90 to-purple-600/90 backdrop-blur-md border border-white/10 p-4 rounded-xl shadow-2xl text-sm leading-relaxed transition-all duration-300 animate-slide-in">
@@ -585,12 +584,12 @@ export const AppContainer: React.FC = () => {
         </div>
       )}
 
-      {/* Sol Sidebar (Gezinti Menüsü) - Sadece Dashboard içindeyken gösterilir */}
+      {/* 1. MASAÜSTÜ SIDEBAR (Desktop Sidebar Layout) */}
       {screen !== 'landing' && screen !== 'onboarding' && (
-        <nav className="w-full md:w-64 border-r border-white/10 bg-slate-900/40 backdrop-blur-md p-6 space-y-8 flex flex-col justify-between">
+        <aside className="w-64 border-r border-white/10 bg-slate-900/40 backdrop-blur-md p-6 space-y-8 hidden md:flex flex-col justify-between h-screen sticky top-0">
           <div className="space-y-8">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setScreen('dashboard')}>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">COACH.AI</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-mono">COACH.AI</span>
               <span className="bg-purple-500/10 text-purple-400 text-[9px] px-1.5 py-0.5 rounded border border-purple-500/20 font-bold uppercase">STUDENT</span>
             </div>
 
@@ -618,6 +617,27 @@ export const AppContainer: React.FC = () => {
           >
             Sistemden Çıkış Yap
           </button>
+        </aside>
+      )}
+
+      {/* 2. MOBİL ALT GEZİNTİ BARBARI (Mobile Bottom Navigation Bar) */}
+      {screen !== 'landing' && screen !== 'onboarding' && (
+        <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-slate-900/90 backdrop-blur-lg border-t border-white/10 flex justify-around items-center py-2 shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
+          {[
+            { id: 'dashboard', label: 'Panel', icon: '📊' },
+            { id: 'chat', label: 'Koç', icon: '💬' },
+            { id: 'lessons', label: 'Dersler', icon: '📚' },
+            { id: 'settings', label: 'Ayarlar', icon: '⚙️' }
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setScreen(item.id as any)}
+              className={`flex flex-col items-center gap-1 transition-all ${screen === item.id ? 'text-purple-400 scale-105 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+            >
+              <span className="text-xl">{item.icon}</span>
+              <span className="text-[10px] uppercase tracking-wider">{item.label}</span>
+            </button>
+          ))}
         </nav>
       )}
 

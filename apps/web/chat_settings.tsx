@@ -58,7 +58,7 @@ export const PremiumChatView: React.FC<{
         {/* Sohbet Başlığı ve Model Bilgisi */}
         <header className="border-b border-white/10 px-6 py-4 bg-slate-900/30 backdrop-blur-md flex justify-between items-center z-10">
           <div>
-            <h4 className="font-bold text-lg">Trigonometri Tekrarı</h4>
+            <h4 className="font-bold text-lg">Haftalık Eğitim Koçluğu</h4>
             <p className="text-xs text-slate-400 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
               Aktif Model: <strong className="text-blue-400">GPT-4o (Premium)</strong>
@@ -77,7 +77,7 @@ export const PremiumChatView: React.FC<{
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex gap-4 p-4 rounded-2xl max-w-3xl ${msg.sender_role === 'assistant' ? 'bg-white/5 border border-white/5 mr-auto' : 'bg-blue-600/10 border border-blue-500/20 ml-auto'}`}
+              className={`flex gap-4 p-4 rounded-2xl max-w-3xl ${msg.sender_role === 'assistant' ? 'bg-white/5 border border-white/5 mr-auto animate-fade-in' : 'bg-blue-600/10 border border-blue-500/20 ml-auto'}`}
             >
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-gradient-to-r from-blue-500 to-purple-500">
                 {msg.sender_role === 'assistant' ? 'AI' : 'U'}
@@ -106,7 +106,7 @@ export const PremiumChatView: React.FC<{
           <div className="max-w-3xl mx-auto flex gap-3 bg-white/5 border border-white/10 rounded-2xl p-2 focus-within:border-purple-500 transition-colors">
             <input
               type="text"
-              placeholder="Yapay zekâ koçuna bir soru sor veya durumunu yaz..."
+              placeholder="Yapay zekâ koçuna bir soru sor veya durumunu yaz... (Örn: Sabah erken uyanamıyorum, geometride zorlanıyorum)"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -265,39 +265,60 @@ export const StudentProfileSettingsView: React.FC<{
         {activeTab === 'psychology' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Motivasyon Seviyesi (1-100)</label>
+              <div className="flex justify-between mb-2">
+                <label className="text-xs uppercase tracking-wider text-slate-400">Motivasyon Seviyesi</label>
+                <span className="text-xs font-mono font-bold text-purple-400">{localProfile.motivation_level || 50}/100</span>
+              </div>
               <input
-                type="number"
-                value={localProfile.motivation_level || 0}
+                type="range"
+                min="0"
+                max="100"
+                value={localProfile.motivation_level || 50}
                 onChange={(e) => setLocalProfile({ ...localProfile, motivation_level: Number(e.target.value) })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full bg-white/5 h-2 rounded-lg appearance-none cursor-pointer accent-purple-500"
               />
             </div>
             <div>
-              <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Sınav Kaygı Seviyesi (1-100)</label>
+              <div className="flex justify-between mb-2">
+                <label className="text-xs uppercase tracking-wider text-slate-400">Sınav Kaygı Seviyesi</label>
+                <span className="text-xs font-mono font-bold text-red-400">{localProfile.anxiety_level || 30}/100</span>
+              </div>
               <input
-                type="number"
-                value={localProfile.anxiety_level || 0}
+                type="range"
+                min="0"
+                max="100"
+                value={localProfile.anxiety_level || 30}
                 onChange={(e) => setLocalProfile({ ...localProfile, anxiety_level: Number(e.target.value) })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full bg-white/5 h-2 rounded-lg appearance-none cursor-pointer accent-purple-500"
               />
             </div>
             <div>
-              <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Odak Süresi (Dakika)</label>
+              <div className="flex justify-between mb-2">
+                <label className="text-xs uppercase tracking-wider text-slate-400">Odaklanma Süresi (Dakika)</label>
+                <span className="text-xs font-mono font-bold text-blue-400">{localProfile.focus_duration_minutes || 45} dk</span>
+              </div>
               <input
-                type="number"
-                value={localProfile.focus_duration_minutes || 0}
+                type="range"
+                min="10"
+                max="120"
+                step="5"
+                value={localProfile.focus_duration_minutes || 45}
                 onChange={(e) => setLocalProfile({ ...localProfile, focus_duration_minutes: Number(e.target.value) })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full bg-white/5 h-2 rounded-lg appearance-none cursor-pointer accent-purple-500"
               />
             </div>
             <div>
-              <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Disiplin Skoru (1-100)</label>
+              <div className="flex justify-between mb-2">
+                <label className="text-xs uppercase tracking-wider text-slate-400">Disiplin Skoru</label>
+                <span className="text-xs font-mono font-bold text-green-400">{localProfile.discipline_score || 75}/100</span>
+              </div>
               <input
-                type="number"
-                value={localProfile.discipline_score || 0}
+                type="range"
+                min="0"
+                max="100"
+                value={localProfile.discipline_score || 75}
                 onChange={(e) => setLocalProfile({ ...localProfile, discipline_score: Number(e.target.value) })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full bg-white/5 h-2 rounded-lg appearance-none cursor-pointer accent-purple-500"
               />
             </div>
           </div>
@@ -324,6 +345,7 @@ export const StudentProfileSettingsView: React.FC<{
                 <label className="flex items-center gap-2 cursor-pointer text-sm">
                   <input
                     type="radio"
+                    name="emoji_allowed"
                     checked={localProfile.emoji_allowed === true}
                     onChange={() => setLocalProfile({ ...localProfile, emoji_allowed: true })}
                     className="accent-purple-500"
@@ -333,6 +355,7 @@ export const StudentProfileSettingsView: React.FC<{
                 <label className="flex items-center gap-2 cursor-pointer text-sm">
                   <input
                     type="radio"
+                    name="emoji_allowed"
                     checked={localProfile.emoji_allowed === false}
                     onChange={() => setLocalProfile({ ...localProfile, emoji_allowed: false })}
                     className="accent-purple-500"

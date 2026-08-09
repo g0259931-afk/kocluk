@@ -63,6 +63,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@saas-coach/admin':
+        specifier: workspace:*
+        version: link:../admin
       '@saas-coach/backend':
         specifier: workspace:*
         version: link:../backend

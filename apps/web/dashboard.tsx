@@ -36,7 +36,7 @@ export const MainDashboardView: React.FC<{
       {/* Ana Metrik Kartları (Dashboard Grid) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Bugünkü Çalışma Süresi */}
-        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl">
+        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl hover:border-blue-500/30 transition-all">
           <span className="text-xs text-slate-400 uppercase tracking-widest font-mono">Çalışma Süresi</span>
           <h3 className="text-2xl font-extrabold mt-2 text-blue-400">
             {formatStudyDuration(profile.avg_daily_study_minutes || 0)}
@@ -45,16 +45,16 @@ export const MainDashboardView: React.FC<{
         </div>
 
         {/* Hedef Net Skor */}
-        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl">
+        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl hover:border-green-500/30 transition-all">
           <span className="text-xs text-slate-400 uppercase tracking-widest font-mono">Net Hedefi</span>
           <h3 className="text-2xl font-extrabold mt-2 text-green-400">
             {profile.current_net_score || 0} / {profile.target_net_score || 100} Net
           </h3>
-          <p className="text-xs text-slate-400 mt-1">Mevcut durum ve Boğaziçi hedefiniz</p>
+          <p className="text-xs text-slate-400 mt-1">Mevcut durum ve hedefiniz</p>
         </div>
 
         {/* Tamamlanan Konu Oranı */}
-        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl">
+        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl hover:border-purple-500/30 transition-all">
           <span className="text-xs text-slate-400 uppercase tracking-widest font-mono">Müfredat Tamamlama</span>
           <h3 className="text-2xl font-extrabold mt-2 text-purple-400">%48</h3>
           <div className="w-full bg-white/10 h-1.5 rounded-full mt-2 overflow-hidden">
@@ -63,7 +63,7 @@ export const MainDashboardView: React.FC<{
         </div>
 
         {/* Yapay Zeka Limit Durumu */}
-        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl">
+        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl hover:border-yellow-500/30 transition-all">
           <span className="text-xs text-slate-400 uppercase tracking-widest font-mono">Premium Kalan Gün</span>
           <h3 className="text-2xl font-extrabold mt-2 text-yellow-400">12 Gün</h3>
           <p className="text-xs text-slate-400 mt-1">Deneme sürümünüz devam ediyor</p>
@@ -110,7 +110,7 @@ export const MainDashboardView: React.FC<{
             <span>✨</span> AI Koç Analiz Raporu
           </h3>
           <p className="text-sm text-slate-300 mt-4 leading-relaxed font-light">
-            "Merhaba {profile.preferred_address || 'Şahin'}, en zayıf hissettiğin ders olan <strong>{profile.weakest_lesson || 'Fizik'}</strong> dersinden son 10 gündür soru çözmediğini gözlemledim. Bugün dinç bir zihinle sabah çalışması yaparak bu açığı kapatmaya odaklanalım. Sana inanıyorum!"
+            "Merhaba {profile.preferred_address || 'Şahin'}! En zayıf hissettiğin ders olan <strong>{profile.weakest_lesson || 'Fizik'}</strong> ve en güçlü olduğun <strong>{profile.strongest_lesson || 'Matematik'}</strong> derslerini başarıyla programımıza ekledim. Hedeflediğin <strong>{profile.target_university || 'Boğaziçi'} {profile.target_department || 'Bilgisayar'}</strong> için her gün ortalama <strong>{formatStudyDuration(profile.avg_daily_study_minutes || 120)}</strong> çalışarak bu yarışı kazanacağız!"
           </p>
           <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
             <span>Mesafe Analizi: Kritik</span>
@@ -161,9 +161,9 @@ export const LessonsManagementView: React.FC<{
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10">
         {lessons.map((lesson) => (
-          <div key={lesson.id} className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl space-y-4">
+          <div key={lesson.id} className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl space-y-4 hover:border-blue-500/20 transition-all">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-bold text-blue-400">{lesson.name}</h3>
               <span className="text-xs uppercase tracking-wider bg-white/5 px-2.5 py-1 rounded text-slate-300">
@@ -175,23 +175,23 @@ export const LessonsManagementView: React.FC<{
             <div className="space-y-3">
               <div className="p-3 bg-white/5 rounded-xl">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="font-semibold">Konu: Limit ve Süreklilik</span>
+                  <span className="font-semibold">Konu: Temel Analiz</span>
                   <span className="text-xs text-green-400">Tamamlandı</span>
                 </div>
                 <div className="pl-4 mt-2 space-y-1 text-xs text-slate-400">
-                  <p>• Alt Konu: Soldan/Sağdan Limit (Kazanım: 4/4)</p>
+                  <p>• Alt Konu: Konu Tanıtımı (Kazanım: 4/4)</p>
                   <p>• Alt Konu: Süreklilik Kuralları (Kazanım: 2/2)</p>
                 </div>
               </div>
 
               <div className="p-3 bg-white/5 rounded-xl border border-dashed border-white/10">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="font-semibold text-slate-300">Konu: Türev ve Uygulamaları</span>
+                  <span className="font-semibold text-slate-300">Konu: İleri Seviye Problemler</span>
                   <span className="text-xs text-yellow-500">Devam Ediyor</span>
                 </div>
                 <div className="pl-4 mt-2 space-y-1 text-xs text-slate-400">
-                  <p>• Alt Konu: Türev Alma Kuralları (Kazanım: Devam Ediyor)</p>
-                  <p>• Alt Konu: Teğet Eğimi (Kazanım: Başlanmadı)</p>
+                  <p>• Alt Konu: Grafik Analizleri (Kazanım: Devam Ediyor)</p>
+                  <p>• Alt Konu: Uygulamalar (Kazanım: Başlanmadı)</p>
                 </div>
               </div>
             </div>

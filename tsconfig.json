@@ -23,6 +23,7 @@
       "@saas-coach/database": ["packages/database/index.ts"],
       "@saas-coach/ai": ["packages/ai/index.ts"],
       "@saas-coach/backend": ["apps/backend/index.ts"],
+      "@saas-coach/admin": ["apps/admin/index.tsx"],
       "@/web/*": ["apps/web/*"],
       "@/admin/*": ["apps/admin/*"],
       "@/backend/*": ["apps/backend/*"],
