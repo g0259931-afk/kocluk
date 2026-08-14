@@ -91,8 +91,7 @@ export class BackendApiService {
         const updatedProfile: StudentProfileEntity = {
           ...currentProfile,
           ...body,
-          updated_at: new Date(),
-          version: currentProfile.version + 1
+          updated_at: new Date()
         };
         const saved = await this.dbAdapter.saveProfile(updatedProfile);
         await this.dbAdapter.logAction(userId, 'settings_updated_manually', { keys: Object.keys(body || {}) }, clientIp);
@@ -153,10 +152,9 @@ export class BackendApiService {
           updatedProfile = {
             ...profile,
             ...profileUpdates,
-            updated_at: new Date(),
-            version: profile.version + 1
+            updated_at: new Date()
           };
-          await this.dbAdapter.saveProfile(updatedProfile);
+          updatedProfile = await this.dbAdapter.saveProfile(updatedProfile);
           await this.dbAdapter.logAction(userId, 'profile_auto_updated_by_ai', profileUpdates, clientIp);
         }
 
