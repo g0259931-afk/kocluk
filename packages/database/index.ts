@@ -245,7 +245,7 @@ export class SupabaseDbAdapter implements IUserRepository, IStudentProfileReposi
       }
     }
 
-    for (const user of SimulatedDatabaseStore.users.values()) {
+    for (const user of Array.from(SimulatedDatabaseStore.users.values())) {
       if (user.email === email && user.deleted_at === null) {
         return user;
       }
@@ -404,7 +404,7 @@ export class SupabaseDbAdapter implements IUserRepository, IStudentProfileReposi
   }
 
   async deleteLessonSoft(id: string): Promise<void> {
-    for (const [userId, list] of SimulatedDatabaseStore.lessons.entries()) {
+    for (const [userId, list] of Array.from(SimulatedDatabaseStore.lessons.entries())) {
       const index = list.findIndex(l => l.id === id);
       if (index >= 0) {
         list[index].deleted_at = new Date();
