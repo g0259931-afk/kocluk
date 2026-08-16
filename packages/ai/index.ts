@@ -258,13 +258,13 @@ export class DualAIEngine {
     }
 
     // 4. Motivasyon ve Özgüven Yakalama
-    if (msg.includes('başaramı') || msg.includes('yapamı') || msg.includes('güvenmi') || msg.includes('zor')) {
+    if (msg.includes('başaram') || msg.includes('yapam') || msg.includes('güvenm') || msg.includes('zor')) {
       const currentConfidence = currentProfile.self_confidence_level || 80;
       updates.self_confidence_level = Math.max(10, currentConfidence - 15);
       const currentMotivation = currentProfile.motivation_level || 80;
       updates.motivation_level = Math.max(10, currentMotivation - 20);
     }
-    if (msg.includes('başaracağ') || msg.includes('yapabilir') || msg.includes('hırslı') || msg.includes('enerjik')) {
+    if (msg.includes('başarac') || msg.includes('yapabil') || msg.includes('hırslı') || msg.includes('enerjik')) {
       const currentConfidence = currentProfile.self_confidence_level || 80;
       updates.self_confidence_level = Math.min(100, currentConfidence + 15);
       const currentMotivation = currentProfile.motivation_level || 80;

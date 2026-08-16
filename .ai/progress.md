@@ -4,11 +4,12 @@
 - [x] Workspace ve Monorepo Dosya Yapısı Kurulumu
 - [x] Living Documentation Dosyalarının Oluşturulması (`docs/`)
 - [x] AI Hafıza Klasörünün Oluşturulması (`.ai/`)
-- [ ] Firebase Auth Abstraction Entegrasyonu
-- [ ] Supabase PostgreSQL DB Entegrasyonu
+- [x] Firebase Auth Abstraction Entegrasyonu
+- [x] Supabase PostgreSQL DB Entegrasyonu
 - [ ] Docker ve Local Development Ortamı Kurulumu
 
 ## Faz 2: Chat & AI Engine
-- [ ] AI Gateway ve Adapter Altyapısı
-- [ ] Çift AI Motoru (Analiz + Koç)
-- [ ] Context ve Token Limit Yönetimi
+- [x] AI Gateway ve Adapter Altyapısı
+- [x] Çift AI Motoru (Analiz + Koç)
+- [x] Context ve Token Limit Yönetimi
+- [x] Workspace Birim Testlerinin Yazılması ve Doğrulanması

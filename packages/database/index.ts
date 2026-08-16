@@ -30,6 +30,18 @@ export class SimulatedDatabaseStore {
   };
 
   /**
+   * Veri mağazasını tamamen temizler ve sıfırlar.
+   */
+  static reset() {
+    this.users.clear();
+    this.profiles.clear();
+    this.lessons.clear();
+    this.subscriptions.clear();
+    this.auditLogs = [];
+    this.bootstrap();
+  }
+
+  /**
    * Varsayılan mock verileri yükler.
    */
   static bootstrap() {
