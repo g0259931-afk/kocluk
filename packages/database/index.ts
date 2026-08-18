@@ -1,6 +1,7 @@
 /**
  * @file packages/database/index.ts
  * @description Veritabanı soyutlama katmanı (Database Abstraction Layer).
+ * Supabase PostgreSQL ve Yerel PostgreSQL için soyutlama adaptörleri sunar.
  * Supabase, ham PostgreSQL, MySQL veya SQLite sağlayıcıları bu arayüzleri (Repository interfaces) uygular.
  * Sistem genelinde gerçek zamanlı çalışma için aktif bir In-Memory veri mağazası (Database Store) barındırır.
  * Supabase REST ve PostgREST servislerine doğrudan HTTPS ve fetch ile bağlanabilen üretim-hazır kod içerir.

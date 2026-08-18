@@ -1,6 +1,7 @@
 /**
  * @file packages/auth/index.ts
  * @description Kimlik doğrulama soyutlama katmanı (Auth Abstraction Layer).
+ * Firebase ve Custom JWT sağlayıcıları için soyutlama adaptörleri sunar.
  * Gerçek kriptografik HMAC-SHA256 JWT (JSON Web Token) üretimi ve doğrulamasını içerir.
  */
 

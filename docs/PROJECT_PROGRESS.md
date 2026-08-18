@@ -1,19 +1,10 @@
 # PROJECT PROGRESS
 
-## Görev Takip Tablosu
+## Genel Durum Özeti
+Proje Faz 1 (Temel Altyapı) kapsamında planlanan tüm soyutlama katmanları (Auth & Database/Repository Abstraction) tamamlanmış, birim testler ile doğrulanmıştır.
 
-| Modül / Aşama | Durum | Açıklama |
-| --- | --- | --- |
-| ☑ Mimari | Tamamlandı | Monorepo altyapısı, config dosyaları ve Living Documentation hazırlandı. |
-| ☐ Auth | Beklemede | Firebase Auth abstraction entegrasyonu. |
-| ☐ Landing | Beklemede | SEO öncelikli, Lighthouse 95+ uyumlu tanıtım web sitesi. |
-| ☐ Dashboard | Beklemede | 5 saniyede bugünkü planı gösteren premium ana ekran. |
-| ☐ Chatbot | Beklemede | Sol/sağ panel tasarımlı, kopyalama/yeniden üretme destekli konuşma ekranı. |
-| ☐ AI Engine | Beklemede | Çift AI motoru (Profil Analiz + Öğrenci Koçu) ve Memory/Token optimizasyon katmanları. |
-| ☐ Dersler | Beklemede | Ders-Kategori-Konu hiyerarşisinde ders yönetim sistemi. |
-| ☐ Analizler | Beklemede | Haftalık/aylık çalışma grafikleri ve AI içgörü yorumları. |
-| ☐ Ayarlar | Beklemede | Student Profile Engine (50+ yapılandırılmış veri alanı). |
-| ☐ Premium | Beklemede | Paket yönetimi, kupon sistemi ve PayTR/İyzico ödeme entegrasyonu. |
-| ☐ Admin | Beklemede | SaaS Kontrol Merkezi ve Sistem Ayarları. |
-| ☐ Test | Beklemede | Unit, entegrasyon ve regresyon testleri. |
-| ☐ Deployment | Beklemede | Vercel ve VPS geçiş senaryolarının entegrasyonu. |
+### Tamamlanan Modüller ve Katmanlar
+1. **Workspace Konfigürasyonu:** Root `package.json` pnpm workspace paket yöneticisi tanımıyla Turborepo düzeni düzeltildi.
+2. **Auth Soyutlama Katmanı (`packages/auth`):** Firebase & Custom JWT adaptörleri, CryptoJwtEngine HMAC-SHA256 JWT imzalaması ve doğrulaması.
+3. **Database Soyutlama Katmanı (`packages/database`):** Supabase REST ve Yerel PostgreSQL adaptörleri, In-memory simülasyon mağazası, Soft Delete ve Audit Logging.
+4. **Yaşayan Dokümantasyon (`docs/` ve `.ai/`):** Tüm ilerleme, todo, completed ve changelog belgeleri güncellendi.
