@@ -6,8 +6,9 @@
 - [ ] `apps/web` Next.js landing page UI tasarımı.
 
 ## IN PROGRESS
-- [ ] Monorepo yapısı ve teknik belgelerin tamamlanması.
+- [ ] MSS v1.0 şartnamesi doğrultusunda paket bağımlılıklarının ve adaptörlerinin entegrasyonu.
 
 ## DONE
 - [x] Monorepo dizin hiyerarşisinin (`apps/*`, `packages/*`) oluşturulması.
-- [x] Tüm Living Documentation (`docs/` ve `.ai/` klasörleri) dosyalarının yazılması.
+- [x] Tüm Living Documentation (`docs/` ve `.ai/` klasörleri) dosyalarının yazılması ve MSS v1.0 ile senkronizasyonu.
+- [x] `package.json` packageManager tanımının yapılması.

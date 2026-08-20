@@ -2,6 +2,7 @@
 
 ## Faz 1: Temel Altyapı
 - [x] Workspace ve Monorepo Dosya Yapısı Kurulumu
+- [x] Turborepo ve Package Manager Konfigürasyonu
 - [x] Living Documentation Dosyalarının Oluşturulması (`docs/`)
 - [x] AI Hafıza Klasörünün Oluşturulması (`.ai/`)
 - [ ] Firebase Auth Abstraction Entegrasyonu
