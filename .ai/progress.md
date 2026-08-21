@@ -4,6 +4,7 @@
 - [x] Workspace ve Monorepo Dosya Yapısı Kurulumu
 - [x] Living Documentation Dosyalarının Oluşturulması (`docs/`)
 - [x] AI Hafıza Klasörünün Oluşturulması (`.ai/`)
+- [x] Root Config & Turborepo Workspace Resolution Yapılandırması
 - [ ] Firebase Auth Abstraction Entegrasyonu
 - [ ] Supabase PostgreSQL DB Entegrasyonu
 - [ ] Docker ve Local Development Ortamı Kurulumu

@@ -6,8 +6,8 @@
 - [ ] `apps/web` Next.js landing page UI tasarımı.
 
 ## IN PROGRESS
-- [ ] Monorepo yapısı ve teknik belgelerin tamamlanması.
 
 ## DONE
 - [x] Monorepo dizin hiyerarşisinin (`apps/*`, `packages/*`) oluşturulması.
 - [x] Tüm Living Documentation (`docs/` ve `.ai/` klasörleri) dosyalarının yazılması.
+- [x] Root level packageManager yapılandırması ve workspace test doğrulaması.

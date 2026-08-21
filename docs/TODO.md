@@ -10,11 +10,11 @@
 - [ ] Monorepo mimarisi ve Living Documentation dosyalarının oluşturulması.
 
 ## REVIEW
-- [ ] Root level config yapısı (tsconfig, turbo.json, package.json).
 
 ## TEST
-- [ ] Workspace paket tanımlamalarının TypeScript ve ESLint ile doğrulanması.
 
 ## DONE
 - [x] Monorepo klasör yapısının (apps/ ve packages/) oluşturulması.
 - [x] Dokümantasyon (.ai/ ve docs/) klasörlerinin tamamlanması.
+- [x] Root level config yapısı (tsconfig, turbo.json, package.json) ve pnpm packageManager tanımı.
+- [x] Workspace paket tanımlamalarının TypeScript ve Node.js native test runner ile doğrulanması.
