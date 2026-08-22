@@ -4,6 +4,7 @@
 - [x] Workspace ve Monorepo Dosya Yapısı Kurulumu
 - [x] Living Documentation Dosyalarının Oluşturulması (`docs/`)
 - [x] AI Hafıza Klasörünün Oluşturulması (`.ai/`)
+- [x] Turborepo Workspace ve Package Manager Yapılandırması (`packageManager: pnpm@10.30.3`)
 - [ ] Firebase Auth Abstraction Entegrasyonu
 - [ ] Supabase PostgreSQL DB Entegrasyonu
 - [ ] Docker ve Local Development Ortamı Kurulumu

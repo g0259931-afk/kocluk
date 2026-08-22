@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "AI SaaS Student Coach Platform Monorepo",
   "private": true,
+  "packageManager": "pnpm@10.30.3",
   "engines": {
     "node": ">=18.0.0"
   },

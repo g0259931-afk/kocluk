@@ -4,7 +4,7 @@
 
 | Modül / Aşama | Durum | Açıklama |
 | --- | --- | --- |
-| ☑ Mimari | Tamamlandı | Monorepo altyapısı, config dosyaları ve Living Documentation hazırlandı. |
+| ☑ Mimari | Tamamlandı | Monorepo altyapısı, pnpm/Turborepo workspace konfigürasyonu, config dosyaları ve Living Documentation hazırlandı. |
 | ☐ Auth | Beklemede | Firebase Auth abstraction entegrasyonu. |
 | ☐ Landing | Beklemede | SEO öncelikli, Lighthouse 95+ uyumlu tanıtım web sitesi. |
 | ☐ Dashboard | Beklemede | 5 saniyede bugünkü planı gösteren premium ana ekran. |
